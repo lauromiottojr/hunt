@@ -8,6 +8,10 @@ export default class Main extends Component {
         title: 'JSHunt'
     };
 
+    state = { // sempre que tem alguma alteração no estado, o metodo render executa
+        docs: [],
+    };
+
     componentDidMount() {
         this.loadProducts();
     }
@@ -15,14 +19,16 @@ export default class Main extends Component {
     loadProducts = async () => { // sem o arrowFunction, ele não consegue enxergar o this, assim não consigo acessar outros metodos da classe
         const response = await api.get('/products');
         const { docs } = response.data;
-        console.log(docs);
+        this.setState({ docs });
     };
-    
 
+    // map() usado para percorrer a lista docs
+    // se eu usar () na arrowFunc, ele entende que eu já estou retornando aquela linha
     render() {
         return (
             <View>
-                <Text>Página Main</Text>
+                <Text>Página Main:</Text>
+                {this.state.docs.map(product => <Text key={product._id}>{product.title}</Text>)}
             </View>
         );
     }
