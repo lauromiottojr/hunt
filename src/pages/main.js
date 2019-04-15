@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import api from '../services/api';
 
 export default class Main extends Component {
@@ -22,13 +22,24 @@ export default class Main extends Component {
         this.setState({ docs });
     };
 
-    // map() usado para percorrer a lista docs
-    // se eu usar () na arrowFunc, ele entende que eu já estou retornando aquela linha
+    renderItem = ({ item }) => (
+        <View>
+            <Text>{item.title}</Text>
+            <Text>{item.description}</Text>
+            <TouchableOpacity  onPress={() => { }}>
+                <Text>Acessar</Text>
+            </TouchableOpacity>
+        </View>
+    )
+
     render() {
         return (
             <View>
-                <Text>Página Main:</Text>
-                {this.state.docs.map(product => <Text key={product._id}>{product.title}</Text>)}
+                <FlatList
+                    data={this.state.docs}
+                    keyExtractor={item => item._id}
+                    renderItem={this.renderItem}
+                />
             </View>
         );
     }
