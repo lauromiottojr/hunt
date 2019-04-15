@@ -9,17 +9,29 @@ export default class Main extends Component {
     };
 
     state = { // sempre que tem alguma alteração no estado, o metodo render executa
+        productInfo: {},
         docs: [],
+        pages: 1,
     };
 
     componentDidMount() {
         this.loadProducts();
     }
 
-    loadProducts = async () => { // sem o arrowFunction, ele não consegue enxergar o this, assim não consigo acessar outros metodos da classe
-        const response = await api.get('/products');
-        const { docs } = response.data;
-        this.setState({ docs });
+    loadProducts = async (page = 1) => { // sem o arrowFunction, ele não consegue enxergar o this, assim não consigo acessar outros metodos da classe
+        const response = await api.get(`/products?page=${page}`);
+        const { docs, ...productInfo } = response.data;
+        this.setState({ docs: [...this.state.docs, ...docs], productInfo, page });
+    };
+
+    loadMore = () => {
+        const { page, productInfo } = this.state;
+
+        if (page == productInfo.pages) return;
+
+        const pageNumber = page + 1;
+
+        this.loadProducts(pageNumber);
     };
 
     renderItem = ({ item }) => (
@@ -40,6 +52,8 @@ export default class Main extends Component {
                     data={this.state.docs}
                     keyExtractor={item => item._id}
                     renderItem={this.renderItem}
+                    onEndReached={this.loadMore}
+                    onEndReachedThreshold={0.1}
                 />
             </View>
         );
@@ -73,7 +87,7 @@ const styles = StyleSheet.create({
         marginTop: 5,
         lineHeight: 24,
     },
-    productButton:{
+    productButton: {
         height: 42,
         borderRadius: 5,
         borderWidth: 2,
